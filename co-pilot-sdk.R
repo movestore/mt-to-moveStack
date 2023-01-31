@@ -2,9 +2,9 @@
 ## input/output ## adjust!
 ##################
 ## Provided testing datasets in `./data/raw`: 
-## "input1_pigeons.rds", "input2_geese.rds", "input3_stork.rds", "input4_goat.rds"  
+## "input1_mt_greylgeese.rds", "input2_mt_whitefgeese.rds", "input3_mt_stork.rds", "input4_mt_goat.rds"  
 ## for own data: file saved as a .rds containing a object of class MoveStack
-inputFileName = "./data/raw/input2_geese.rds" 
+inputFileName = "./data/raw/input2_mt_whitefgeese.rds" 
 
 ## optionally change the output file name
 unlink("./data/output/", recursive = TRUE) # delete "output" folder if it exists, to have a clean start for every run
@@ -24,7 +24,7 @@ outputFileName = "./data/output/output.rds"
 
 args <- list() # if your function has no arguments, this line still needs to be active
 # Add all your arguments of your r-function here
-args[["year"]] = 2014 
+#args[["year"]] = 2014 
 
 ##############################
 ## source, setup & simulate ## leave as is!
