@@ -1,5 +1,6 @@
 library('move')
 library('move2')
+library("dplyr")
 
 ## The parameter "data" is reserved for the data object passed on from the previous app
 
@@ -9,8 +10,25 @@ library('move2')
 rFunction = function(data) {
   #mt object can have length 0, movestack/move object not (i.e. NULL)
   if (dim(data)[1]==0) result <- NULL else { 
-    result <- to_move(data)
-    if (is(result,'Move')) result <- moveStack(result,forceTz=attr(timestamps(result),"tzone"))
+    ## making sure tracks are orderes, timestamps are ordered and duplicate timestamps are removed in order to be able to create a movestack
+    if(!mt_is_track_id_cleaved(data)){
+      logger.info("Your data set was not grouped by individual/track. We regroup it for you.")
+      data <- data |> dplyr::arrange(mt_track_id(data))
+    }
+    if(!mt_is_time_ordered(data)){
+      logger.info("Your data is not time ordered (within the individual/track groups). We reorder the locations for you.")
+      data <- data |> dplyr::arrange(mt_track_id(data),mt_time(data))
+    }
+    if (!mt_has_unique_location_time_records(data)){
+      n_dupl <- length(which(duplicated(paste(mt_track_id(data),mt_time(data)))))
+      logger.info(paste("Your data has",n_dupl, "duplicated location-time records. We removed here those with less info and then select the first if still duplicated."))
+      ## this piece of code keeps the duplicated entry with least number of columns with NA values
+      data <- data %>%
+        mutate(n_na = rowSums(is.na(pick(everything())))) %>%
+        arrange(n_na) %>%
+        mt_filter_unique(criterion='first') # this always needs to be "first" because the duplicates get ordered according to the number of columns with NA. 
+    }
+    result <- moveStack(to_move(data))
   }
   return(result)
 }

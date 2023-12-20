@@ -8,6 +8,9 @@
       },
       {
         "name": "move"
+      },
+      {
+        "name": "dplyr"
       }
     ]
   },
